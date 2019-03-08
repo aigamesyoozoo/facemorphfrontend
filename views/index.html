@@ -1,0 +1,313 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<title>Anime Face Morp</title>
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css"
+		integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+		integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<style type="text/css">
+		body {
+			padding: 40px 50px 50px 20px;
+		}
+
+		p {
+			text-align: center;
+			font-size: 20px;
+		}
+
+		.btnCamera {
+			/* position: absolute; */
+			/* margin: 0 auto; */
+			/* top: 395px;
+			left: 570px; */
+			border-radius: 100%;
+			background: transparent;
+			color: white;
+			font-size: 25px;
+		}
+
+		.divBtnCamera {
+			position: relative;
+			top: 100px;
+			margin: 0 auto;
+			width: 200px;
+			height: 40px;
+			display: flex;
+			justify-content: center;
+		}
+
+		.divBtnCamera1 {
+			position: relative;
+			top: -60px;
+			margin: 0 auto;
+			width: 200px;
+			height: 40px;
+			display: flex;
+			justify-content: center;
+		}
+
+		#btnGenerate,
+		#btnBack {
+			font-size: 20px;
+			width: 100%;
+		}
+
+		#aim {
+			width: 120px;
+			height: 160px;
+			border: 2px solid white;
+			margin: 0 auto;
+			position: relative;
+			top: -120px;
+			/* position: absolute;
+			top: 160px;
+			left: 530px; */
+			border-radius: 20px;
+		}
+
+		#out_camera {
+			margin: 0 auto;
+			/* width: 640px; */
+			width: 100%;
+			height: 400px;
+		}
+
+		#my_photo_booth {
+			width: 320px;
+			height: 240px;
+			margin: 0 auto;
+			background-clip: content-box;
+		}
+
+
+
+		#display {
+			margin: 0 auto;
+			width: 40%;
+		}
+
+		input[type="radio"] {
+			display: none;
+		}
+
+		input[type=radio]:checked+img {
+			/* box-shadow:0px 6px 11px 1px orangered; */
+			border: 4px solid orange;
+		}
+
+		img:hover {
+			border: 4px solid lightskyblue;
+		}
+
+		img {
+			border-radius: 10px;
+		}
+
+		.img_character {
+			width: 300px;
+			height: 300px;
+		}
+
+		.btn-warning {
+			color: white;
+		}
+
+		.grid_left {
+			width: 150px;
+			height: 200px;
+			object-fit: cover;
+		}
+	</style>
+</head>
+
+<body>
+
+	<div id="out_camera">
+		<div id="my_photo_booth">
+			<div id="my_camera" style="margin: 0 auto;"></div>
+		</div>
+
+		<div id="aim"></div>
+		<!-- A button for taking snaps -->
+		<div id="pre_take_buttons" class="divBtnCamera1">
+			<button class="btnCamera" type="button"><i class="fas fa-camera" onClick="preview_snapshot()"></i></button>
+		</div>
+		<div id="post_take_buttons" class="divBtnCamera" style="display:none;">
+			<!-- These buttons are shown after a snapshot is taken -->
+			<button class="btnCamera" type="button"><i class="fas fa-redo" onClick="cancel_preview()"></i></button>
+		</div>
+	</div>
+
+	<br><br><br>
+
+	<div id="selection">
+		<p> Morph with </p>
+
+		<div id="selection_images">
+			<form method="GET">
+				<div class="row">
+					<div class="col-sm">
+						<label>
+							<input type="radio" name="selection" value="1">
+							<img src="../images/anime1.jpg" class="img_character">
+						</label>
+					</div>
+					<div class="col-sm">
+
+						<label>
+							<input type="radio" name="selection" value="2">
+
+							<img src="../images/anime2.jpg" class="img_character">
+						</label>
+					</div>
+					<div class="col-sm">
+
+						<label>
+							<input type="radio" name="selection" value="3">
+
+							<img src="../images/anime3.jpg" class="img_character">
+						</label>
+					</div>
+				</div>
+				<input id="snapped_uri" name="snapped_uri" type="hidden" class="form-control">
+
+				<!-- <input type="submit" value="Morph!" onClick="morph()"> -->
+				<div>
+					<input id="btnGenerate" type=button value="Generate" onClick="save_photo()" class="btn btn-warning"
+						style="display:none;">
+				</div>
+		</div>
+		</form>
+	</div>
+
+	<div id="display" style="display:none;">
+		<div>
+			<div style="float:left;">
+				<div>
+					<img id="results" class="grid_left">
+				</div>
+				<div>
+					<img id="character" class="img_character grid_left">
+				</div>
+			</div>
+			<div style="float:right">
+				<img src="../images/anime1.jpg" style="width:300px;height: 400px; object-fit: cover;">
+			</div>
+		</div>
+		<div>
+			<input id="btnBack" type=button value="Back" class="btn btn-warning" onClick="reselect()"></div>
+	</div>
+	</div>
+
+
+
+	<!--JAVASCRIPT-->
+	<script type="text/javascript" src="../webcam.min.js"></script>
+	<script language="JavaScript">
+		Webcam.set({
+			// live preview size
+			width: 520,
+			height: 390,
+
+			// device capture size
+			dest_width: 640,
+			dest_height: 480,
+
+			// final cropped size
+			crop_width: 320,
+			crop_height: 480,
+
+			// format and quality
+			image_format: 'jpeg',
+			jpeg_quality: 90,
+
+			// flip horizontal (mirror mode)
+			flip_horiz: true
+		});
+		Webcam.attach('#my_camera');
+	</script>
+
+
+	<!-- Code to handle taking the snapshot and displaying it locally -->
+	<script language="JavaScript">
+		// preload shutter audio clip
+		var shutter = new Audio();
+		shutter.autoplay = false;
+		shutter.src = navigator.userAgent.match(/Firefox/) ? 'shutter.ogg' : 'shutter.mp3';
+
+		function preview_snapshot() {
+			// play sound effect
+			try { shutter.currentTime = 0; } catch (e) { ; } // fails in IE
+			shutter.play();
+
+			// freeze camera so user can preview current frame
+			Webcam.freeze();
+
+			// swap button sets
+			document.getElementById('pre_take_buttons').style.display = 'none';
+			document.getElementById('aim').style.display = 'none';
+			document.getElementById('post_take_buttons').style.display = '';
+			document.getElementById('btnGenerate').style.display = '';
+
+		}
+
+		function cancel_preview() {
+			// cancel preview freeze and return to live camera view
+			Webcam.unfreeze();
+
+			// swap buttons back to first set
+			document.getElementById('pre_take_buttons').style.display = '';
+			document.getElementById('aim').style.display = '';
+			document.getElementById('post_take_buttons').style.display = 'none';
+			document.getElementById('btnGenerate').style.display = 'none';
+		}
+
+		function save_photo() {
+			// actually snap photo (from preview freeze) and display it
+			Webcam.snap(function (data_uri) {
+
+				// shut down camera, stop capturing
+				Webcam.reset();
+
+
+				// show results, hide photo booth
+				document.getElementById('out_camera').style.display = 'none';
+				document.getElementById('selection').style.display = 'none';
+
+				// Store data uri in the form and display photo
+				document.getElementById('snapped_uri').value = data_uri;
+				document.getElementById('results').src = data_uri;
+
+				// display selected character
+				document.getElementById('character').src = '../images/anime' +
+					document.querySelector('input[name="selection"]:checked').value +
+					'.jpg';
+
+				// display results div
+				document.getElementById('display').style.display = '';
+
+				//hide everything
+				document.querySelector('input[name="selection"]:checked').style.co
+			});
+		}
+
+		function reselect() {
+
+			// hide display
+			document.getElementById('display').style.display = 'none';
+
+			// show results, hide photo booth
+			Webcam.attach('#my_camera');
+			document.getElementById('out_camera').style.display = '';
+			document.getElementById('pre_take_buttons').style.display = '';
+			document.getElementById('aim').style.display = '';
+			document.getElementById('selection').style.display = '';
+		}
+	</script>
+</body>
+
+</html>
